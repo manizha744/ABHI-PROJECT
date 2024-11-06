@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <title>Add Department</title>
+    <style>
+        .container {
+            margin-top: 30px;
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container px-3">
+        <h1 class="text-center mb-4">Add New Department</h1>
+
+        <div class="mb-3">
+            <label for="departmentName" class="form-label">Department Name</label>
+            <input type="text" class="form-control" id="departmentName" placeholder="Enter Department Name">
+        </div>
+        <div class="mb-3">
+            <label for="universitySelect" class="form-label">Select University</label>
+            <select class="form-select" id="universitySelect">
+                <option value="">Choose a university</option>
+            </select>
+        </div>
+        <button class="btn btn-primary" id="addDepartmentBtn">Add Department</button>
+        <a href="index.html" class="btn btn-secondary mt-2">Back to Home</a>
+    </div>
+
+    <script>
+        const universitySelect = document.querySelector('#universitySelect');
+
+        async function fetchUniversities() {
+            const response = await fetch('http://localhost:3000/universities');
+            const universities = await response.json();
+            universities.forEach(u => {
+                const option = document.createElement('option');
+                option.value = u.id;
+                option.textContent = u.name;
+                universitySelect.appendChild(option);
+            });
+        }
+
+        document.getElementById('addDepartmentBtn').addEventListener('click', async () => {
+            const name = document.getElementById('departmentName').value;
+            const universityId = universitySelect.value;
+
+            if (name && universityId) {
+                const response = await fetch('http://localhost:3000/departments', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, universityId })
+                });
+
+                if (response.ok) {
+                    alert('Department added successfully!');
+                    document.getElementById('departmentName').value = ''; // Clear input
+                } else {
+                    alert('Error adding department.');
+                }
+            } else {
+                alert('Please fill in all fields.');
+            }
+        });
+
+        window.onload = fetchUniversities;
+    </script>
+</body>
+</html>
